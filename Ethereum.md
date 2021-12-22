@@ -23,11 +23,15 @@
 
 * トランザクションにデータが含まれている場合、データはコントラクト内で名前付き関数を指定して呼び出し、その関数に引数を渡すことができる。
 
+コントラクト履歴表示：https://ropsten.etherscan.io/
+
 ### Solidity
 
 Solidityコンパイラは、様々なフレームワークの一部としてスタンドアローンの実行可能ファイルとして提供されており、統合開発環境（Integrated Development Environment : IDE）に包含されています。
 
 **ここでは「Remix」と呼ばれるIDEを使用する**
+
+https://remix.ethereum.org/
 
 ファウセットコントラクトには独自のアドレスがあることに注意
 
