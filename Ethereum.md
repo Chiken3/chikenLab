@@ -39,6 +39,8 @@ Faucet at 0x5616ce1902Cd09d17f38e18a2135b30851fb2d2C
 
 
 
+https://cryptozombies.io/jp/lesson/1/chapter/1
+
 ### Ethereumのクライアント環境を構築
 
 Ethereumの仕様は、「イエローペーパー」と呼ばれる英語と数式の使用を組み合わせた論文に記載
@@ -55,6 +57,8 @@ Ethereumを使った開発において、
 を使用してほとんどの作業ができる。
 
 今回はローカルプライベートブロックチェーンのクライアントで開発する。
+
+https://geth.ethereum.org/docs/interface/private-network
 
 ### Go-Ethereum (Geth)
 
