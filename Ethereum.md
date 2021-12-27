@@ -97,3 +97,10 @@ ERC721ではトークンを発行する際にTokenURIの設定が必要
 
 JSONファイルのURLを設定することでトークンの画像や情報を登録できる。
 
+
+
+https://github.com/ethereum/EIPs/issues/1257
+
+https://partners.candyhouse.co/
+
+https://doc.candyhouse.co/ja/SesameAPI
