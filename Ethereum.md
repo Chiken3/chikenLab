@@ -1,5 +1,11 @@
 # Ethereum
 
+solidity
+
+web api ウォレット
+
+oracle interface
+
 ### Ethereumのウォレットの選択
 
 * MetaMask (Webベース)
@@ -7,7 +13,9 @@
 * MyEtherWallet (Web)
 * Emerald Wallet (デスクトップ)
 
-はじめにMetaMaskを使ってみる.
+---
+
+
 
 ### コントラクトを作る
 
@@ -24,6 +32,10 @@
 * トランザクションにデータが含まれている場合、データはコントラクト内で名前付き関数を指定して呼び出し、その関数に引数を渡すことができる。
 
 コントラクト履歴表示：https://ropsten.etherscan.io/
+
+---
+
+
 
 ### Solidity
 
@@ -44,39 +56,66 @@ Faucet at 0x5616ce1902Cd09d17f38e18a2135b30851fb2d2C
 
 https://cryptozombies.io/jp/lesson/1/chapter/1
 
+---
+
+
+
 ### Ethereumのクライアント環境を構築
 
-Ethereumの仕様は、「イエローペーパー」と呼ばれる英語と数式の使用を組み合わせた論文に記載
+Ethereumの仕様は、「イエローペーパー」と呼ばれる英語と数式を組み合わせた論文に記載
 
-今回はEthereumの3つのオリジナルの実装(Go, Python, C++)のうちGoでかかれた実装である通称Go Ethereum(Geth)で環境を構築する。
+Ethereumの3つのオリジナルの実装(Go, Python, C++)のうちGoでかかれた実装がある。
+今回は通称 Go Ethereum(Geth)で環境を構築する。
 
 Ethereumを使った開発において、
 
-* メインネット上で動作するフルノード、
-* テストネットノード、
-* Ganacheなどのローカルプライベートブロックチェーン、
-* Infuraなどのサービスプロバイダが提供するクラウドベースのイーサリアムクライアント
+* **メインネット上で動作するフルノード**
+* **テストネットノード**
+* **Ganacheなどのローカルプライベートブロックチェーン**
+* **Infuraなどのサービスプロバイダが提供するクラウドベースのイーサリアムクライアント**
 
 を使用してほとんどの作業ができる。
 
 今回はローカルプライベートブロックチェーンのクライアントで開発する。
-
 https://geth.ethereum.org/docs/interface/private-network
 
 ### Go-Ethereum (Geth)
 
-https://geth.ethereum.org/
+**Gothは様々な方法でインストールできる。**
+参照(https://geth.ethereum.org/docs/install-and-build/installing-geth)
 
-リポジトリをクローン
+今回はUbuntuのインストールパターンをまとめる。
 
-```
-$ git clone https://github.com/ethereum/go-ethereum
-$ cd go-ethereum
-$ make geth
-$ ./build/bin/geth version #動作確認
-```
+* **PPAの介してUbuntuにインストールする。**
 
+  ```bash
+  #!/bin/bash
+  sudo apt update
+  sudo apt upgrade -y
+  sudo apt install -y apt-file
+  sudo apt-file update
+  
+  sudo apt -get update
+  sudo add-apt-repository -y ppa:ethereum/ethereum
+  sudo apt-get update
+  sudo apt-get install ethereum
+  geth --help
+  
+  ```
 
+  
+
+* **ソースからGethビルドする**
+
+  ```bash
+  #!/bin/bash
+  git clone https://github.com/ethereum/go-ethereum
+  cd go-ethereum
+  make geth
+  ./build/bin/geth version #動作確認
+  ```
+
+  
 
 > 「リモートクライアント」と「ウォレット」という用語は同じ意味で使用されていますが、いくつかの違いがある。通常リモートクライアントはウォレットのトランザクション機能に加えてAPI(web3.js APIなど)も提供します。
 
@@ -87,6 +126,94 @@ $ ./build/bin/geth version #動作確認
 > リモートクライアントは、ブロックヘッダー及びトランザクションを検証しない。
 > リモートクライアントはフルクライアントを完全に信頼し、ブロックチェーンへのアクセスを許可します。そのため、重要なセキュリティと匿名性の保証が大きく失われる。
 > 自身でフルクライアントをたてて使用することで、この問題はいくらか軽減する。
+
+---
+
+## Ethereum プライベートネットに接続する。 
+
+* **プライベート・ネットワーク**：
+
+  一つの組織のみに管理されたノードのみが参加することが可能なネットワークです。ネットワークは自身の管理下に置くことが可能になり、中央集権的なP2Pシステムが可能になります。
+
+  プライベート・ネットワークは、自分自身のみのネットワークなので容易にEtherの採掘が可能ですし、安全性も高いネットワークです。そのため、Ethereumの動作を調べたり、分散型アプリケーション（Dapp）の開発作業など個人的な作業を行うには、プライベート・ネットワークを立ち上げてそこでいろいろ弄ってみると便利です。
+
+##### genesisブロック作成からgethの起動まで
+
+```bash
+#!/bin/bash
+cd
+mkdir eth_private_net
+cd eth_private_net
+touch myGenesis.json
+echo "{
+  "config": {
+    "chainId": 15,
+    "homesteadBlock": 0,
+    "eip150Block": 0,
+    "eip155Block": 0,
+    "eip158Block": 0,
+    "byzantiumBlock": 0,
+    "constantinopleBlock": 0,
+    "petersburgBlock": 0,
+    "istanbulBlock": 0,
+    "berlinBlock": 0
+  },
+  "nonce": "0x0000000000000042",
+  "timestamp": "0x0",
+  "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "extraData": "",
+  "gasLimit": "0x8000000",
+  "difficulty": "0x4000",
+  "mixhash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "coinbase": "0x3333333333333333333333333333333333333333",
+  "alloc": {}
+}" >> myGenesis.json
+
+# genesis block init
+geth --datadir ~/eth_private_net init ~/eth_private_net/myGenesis.json 
+# geth setup
+geth --networkid "15" --nodiscover --datadir "~/eth_private_net" console 2>> ~/eth_private_net/geth_err.log
+```
+
+> * `--datadir` :本オプションはgethの動作時のブロックチェーンデータや各種ログの出力先を指定します。genesisブロックの初期化で指定したディレクトリと同一のものを指定してください。
+> * `--networkid "15"` ：本オプションで任意の正の整数のIDを指定することで、ライブ・ネットとは異なるネットワークを立ち上げることが可能です（ここでは15を指定）。genesisブロックの初期化で指定した`chainid`と同一の値を指定する必要があります。
+> * `--nodiscover` ：Gethはデフォルトで自動的に（同じネットワークID）のEthereumネットワークのノード（Peer）を探し接続を試みます。プライベート・ネットでは未知のノードとの接続を避けるため、このオプションで自動Peer探索機能を無効にします。
+> * `console`：Gethには採掘やトランザクションの生成などを対話的に進めることができるコンソールが用意されています。`console`サブ・コマンドを指定することで、Gethの起動時に同時にコンソール立ち上げることが可能です。なお、`console`サブ・コマンドを付加せずに、Gethのプロセスをバックグラウンドで起動させておき、後からそのプロセスのコンソールを起動する事も可能です（下記TIP参照）。
+
+```bash
+$ # バックグラウンド起動について
+
+$ # consoleサブ・コマンドを付加せず、かつ最後に"&"を付加、バックグラウンドで起動します。
+$ # この場合、起動時にはコンソールは立ち上がりません。
+$ geth --networkid "15" --nodiscover --datadir "~/eth_private_net" 2>> ~/eth_private_net/geth_err.log &
+$
+$ # attachサブ・コマンドを用いて先に立ち上げたプロセスのコンソールを立ち上げます。
+$ # ここで、ipc:以降に先に立ち上げたgethプロセスのデータ用ディレクトリ以下のgeth.ipcファイル（実際はソケット）のパスを指定します。
+$ geth --datadir "~/eth_private_net" attach ipc:~/eth_data/geth.ipc
+```
+
+---
+
+## etherの採掘
+
+Gethのコンソール上で新規のアカウントを作成します。
+
+Ethereumには **EOA**（Externally Owned Account) と**Contract** の２種類のアカウントがある。
+
+```bash
+> personal.newAccount("password")
+"0x9278df10c383e2845351e2ee2ade2d365a97ff9c"
+> eth.accounts
+["0x9278df10c383e2845351e2ee2ade2d365a97ff9c", "0x2272146283a19cee63b6a886b91c89f85ae703db"]
+>eth.coinbase #マイニング報酬を受け取るEOAアドレスを表示etherbaseとも言う
+"0x9278df10c383e2845351e2ee2ade2d365a97ff9c"
+#>miner.setEtherbase(eth.accounts[1]) #etherbaseの変更例
+> miner.start()
+> miner.stop()
+> eth.blockNumber
+> eth.getBalance(eth.accounts[0])
+> web3.fromWei(eth.getBalance(eth.accounts[0]),"ether")
+```
 
 
 
@@ -214,7 +341,7 @@ ex) : 投票権やアクセス権リソースの所有権を同時に意味す�
   デジタルシステムまたは法的システムにおける投票権を表す。
 * **収集品**
   デジタル収集品または物理的な収集品を表す。
-* アイデンティティ
+* **アイデンティティ**
   デジタルアイデンティティ(アバターなど)または法的アイデンティティ(国民IDなど)を表す
 * **証明**
   行政当局、または、非中央集権型の評価システムによる証明書または事実(ex : 結婚記録、出生証明、大学の学位)を証明
