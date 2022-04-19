@@ -1,0 +1,1 @@
+# How to develop smart contracts easily

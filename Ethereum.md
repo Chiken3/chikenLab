@@ -1,10 +1,26 @@
 # Ethereum
 
-solidity
+###  Web3 のユースケース
 
-web api ウォレット
+* [**DeFi**](https://defiprime.com/)**プロトコル** (AaveやMakerDAOなど) 
 
-oracle interface
+  スマート・コントラクトにより運営される貸付／借入サービスを可能にする。スマート・コントラクトによって仲介者が排除されるため、リスクは大幅に高くなるが、より高い利回りと利益率を実現する。
+
+* **NFTを使用したPlay-to-Earnゲーム**
+
+  ユーザーが収入を得る手段を提供する。ゲームの収益を、恵まれないユーザーを対象とした[**奨学金の資金として活用するNPO**](https://nftscholarship.org/)も登場している。
+
+* **NFTスマート・コントラクトを使用して作品を販売**
+
+  例えばアート作品の販売時には、仲介者ではなく、アーティストが自ら設定した契約条項に基づいて、支払いを受けられる。
+
+### timescajure
+
+https://zoom-blc.com/solidity-time-logic
+
+### 信用度の高い情報源
+
+* **( https://ethereum.org/ja/ )**
 
 ### Ethereumのウォレットの選択
 
@@ -171,7 +187,7 @@ echo "{
 
 # genesis block init
 geth --datadir ~/eth_private_net init ~/eth_private_net/myGenesis.json 
-# geth setup
+# geth start
 geth --networkid "15" --nodiscover --datadir "~/eth_private_net" console 2>> ~/eth_private_net/geth_err.log
 ```
 
@@ -215,12 +231,211 @@ Ethereumには **EOA**（Externally Owned Account) と**Contract** の２種類�
 > web3.fromWei(eth.getBalance(eth.accounts[0]),"ether")
 ```
 
+### etherの送金
 
+```bash
+> personal.unlockAccount(eth.accounts[0]) //アカウントのロック解除。パスワードを求められるので、適宜パスワードを入力する。
+> eth.sendTransaction({from: eth.accounts[0], to: eth.accounts[1], value: web3.toWei(5, "ether")}) //送金の実行。実行結果としてトランザクションIDが返される。
+"0x86a9ec537c3dbc2744051774c025571048346970461609ea62e07aacac794904"
+
+```
+
+### スマートコントラクト
+
+Solidityコンパイラのインストール
+
+```bash
+#!/bin/bash 
+sudo add-apt-repository ppa:ethereum/ethereum
+sudo apt-get update
+sudo apt-get install solc
+solc --version
+```
+
+スマートコントラクト実行までの流れ
+
+1. Solidity言語でスマートコントラクトの内容を記述したコントラクト・コードをプログラミングする。
+2. コントラクト・コードのコンパイル
+3. 「Contract」アカウントを生成
+   1. コンパイル済みのコードをトランザクションに付加してネットワークに送信する。そのトランザクションを受信した採掘者は、トランザクションをブロックチェーンに登録する。これにより「Contract」アカウントが生成されそのアドレスが発行される。
+4. スマートコントラクトへのアクセスと実行
+   1. スマートコントラクトを実行したいユーザーはContractアカウントへトランザクションを発行することによりスマートコントラクトを実行する。
+
+###### コントラクトの例
+
+```solidity
+pragma solidity ^0.4.0;
+contract SingleNumRegister {
+    uint storedData;
+    function set(uint x) public{
+        storedData = x;
+    }
+    function get() public constant returns (uint retVal){
+        return storedData;
+    }
+}
+```
+
+```bash
+$ solc --abi --bin SingleNumRegister.sol
+```
+
+#### 「Contract」アカウントを生成
+
+```javascript
+var bin ="0x608060405234801561001057600080fd5b50610150806100206000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c806360fe47b11461003b5780636d4ce63c14610057575b600080fd5b610055600480360381019061005091906100c3565b610075565b005b61005f61007f565b60405161006c91906100ff565b60405180910390f35b8060008190555050565b60008054905090565b600080fd5b6000819050919050565b6100a08161008d565b81146100ab57600080fd5b50565b6000813590506100bd81610097565b92915050565b6000602082840312156100d9576100d8610088565b5b60006100e7848285016100ae565b91505092915050565b6100f98161008d565b82525050565b600060208201905061011460008301846100f0565b9291505056fea2646970667358221220d6f7ec3dcefec348acce311a2650e8bf57e96c4004b664209478157eddfc890064736f6c634300080b0033"
+
+var abi = [{"inputs":[],"name":"get","outputs":[{"internalType":"uint256","name":"retVal","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"x","type":"uint256"}],"name":"set","outputs":[],"stateMutability":"nonpayable","type":"function"}]
+var contract = eth.contract(abi)
+personal.unlockAccount(eth.accounts[0]) //使用するEOAをアンロックしておく
+var myContract = contract.new({ from: eth.accounts[0], data: bin})
+```
+
+`myContract`の内容を表示
+
+```javascript
+> myContract
+{
+  abi: [{
+      inputs: [],
+      name: "get",
+      outputs: [{...}],
+      stateMutability: "nonpayable",
+      type: "function"
+  }, {
+      inputs: [{...}],
+      name: "set",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function"
+  }],
+  address: undefined, //ここにアドレスが表示されればEthereum上に記録された "0x57e6f089880b87437fde0e80a9e7bdaded73e5d2"
+  transactionHash: "0x007e925106512db27cbb2182f0f79019dd43b3956bc64558d40aeff3459a2b46"
+}
+```
+
+
+
+#### 「Contract」アカウントへのアクセス
+
+スマートコントラクトを利用してもらうためには、以下の2種類の情報を他のユーザーに伝える必要があります。
+
+* Contractのアドレス
+
+* ContractのABI (Application Binary Interface)
+
+  ABIとはContractの取り扱い説明書のようなものです。例えば、このContractがどのような名前の関数が定義されているか、それぞれの関数にアクセスするために、どのような型のパラメータを渡す必要があるか、関数の実行結果はどのような型のデータが返るか、などの情報が含まれたものです。
+
+  ```
+  > myContract.abi
+  [{
+        constant: false,
+        inputs: [{...}],
+        name: "set",
+        outputs: [],
+        payable: false,
+        stateMutability: "nonpayable",
+        type: "function"
+    }, {
+        constant: true,
+        inputs: [],
+        name: "get",
+        outputs: [{...}],
+        payable: false,
+        stateMutability: "view",
+        type: "function"
+    }]
+  ```
+
+  #####  Contractアカウントへアクセス
+
+  ```javascript
+  //eth.contract(ABI_DEF).at(ADDRESS);
+  > var cnt = eth.contract(myContract.abi).at(myContract.address);
+  > personal.unlockAccount(eth.accounts[0]) //使用するEOAをアンロックしておく
+  > cnt.set.sendTransaction(6,{from:eth.accounts[0]})
+  "0x0607d6c6142d31ccdde3e452a1b08c4ed4ad2cb901e5269b75d80a4330ee1e55"
+  ```
+
+  1. トークンの作成
+     OpenZeppelin
+  2. トークンの送信
+     
+  3. トークンのTimeLock
+  4. Userロール実装(トークンの棄却を不可能にする)
+  5. Solidityでのオラクルインターフェイス(マスタリングp277)
+  6. キャンディハウスのAPI動作
+
+#### Contractの開発環境(IDE)
+
+デスクトップ上の開発環境(https://ethereum.org/ja/developers/docs/ides/)
+
+* **Remix Desktop**
+  Releasesを参照する。今回はremix-ide_1.3.3_amd64.debをダウンロード
+
+  ```bash
+  sudo apt install ./remix-ide_1.3.3_amd64.deb 
+  ```
+
+  
+
+## トークンを作る
+
+## token timelock
+
+## Ethereum smart contract to web API
+
+https://betterprogramming.pub/how-to-call-apis-from-ethereum-smart-contracts-e2f1500198c7
 
 
 ## ERC721のトークンを作る
 
+https://zenn.dev/razokulover/scraps/5ad38e06db0d55
+
 ERC721:スマートコントラクト内でNon-Fungible Tokenを扱えるようにしたものです。
+
+**ERC721規格について**:
+	実装が必要なメソッドリストは以下になる。
+
+```solidity
+contract ERC721 {
+  event Transfer(address indexed _from, address indexed _to, uint256 _tokenId);
+  event Approval(address indexed _owner, address indexed _approved, uint256 _tokenId);
+  event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
+  
+  function balanceOf(address _owner) public view returns (uint256 _balance);
+  function ownerOf(uint256 _tokenId) public view returns (address _owner);
+  function transfer(address _to, uint256 _tokenId) public;
+  function approve(address _to, uint256 _tokenId) public;
+  function takeOwnership(uint256 _tokenId) public;
+}
+```
+
+トークン・コントラクト実装の際、初めにすべきはインターフェイスをSolidityファイルにコピー/インポートすることである。(import "./erc721.sol")すると我々のコントラクトはそれを継承し、関数定義で各メソッドをオーバーライドする。
+Solidityではコントラクトを以下のように複数コントラクト継承可能 :
+
+```solidity
+contract SatoshiNakamoto is NiciSzabo, HalFinney{
+	//SatoshiNakamotoはNickSzaboとHalFinneyを継承している。
+}
+```
+
+
+
+#### hardhat
+
+#### truffle compile
+
+```
+$ truffle compile
+```
+
+https://zenn.dev/shunp110/articles/3bc9e8a75095dd
+
+##### timeLock constract
+
+transaction hash:    0xa44e1251ac0eb10904f5a4149682e093bb4bd953b034a9a6424f55218a9439c5
+contract address:    0x34bAfA8A571D6fF92DC259700ecA63A2e4508872
 
 ### TokenURI設定
 ERC721ではトークンを発行する際にTokenURIの設定が必要
@@ -234,6 +449,19 @@ https://github.com/ethereum/EIPs/issues/1257
 https://partners.candyhouse.co/
 
 https://doc.candyhouse.co/ja/SesameAPI
+
+block.timestamp https://ethereum.stackexchange.com/questions/58278/setting-time-requirements-in-solidity
+
+## DApp
+
+DAppは、大部分またはすべてが非中央集権化されたアプリケーション。
+非中央集権化できるのは
+
+* バックエンドソフトウェア（スマートコントラクトなど）
+* フロントエンドソフトウェア
+* データストレージ
+* メッセージ通信
+* 名前解決
 
 
 
@@ -576,17 +804,16 @@ IPFS同様Swarmノードによって配布、複製されるファイルを格�
 登録されたトークンをリスト化し、他のユーザーが入札することができる。各オークションでは、ユーザーはそれぞれのオークションの為に特別に用意されたチャットルームに参加できます。オークションが完了すると証書トークンの所有権がオークションの落札者に移転する。
 
 * **↓**オークションDAppの主なコンポーネント **(p286 図)**
-
-  * ERC721ノンファンジブル「Deed (証書)」トークン(DeedRepository) を実装するスマートコントラクト
+* ERC721ノンファンジブル「Deed (証書)」トークン(DeedRepository) を実装するスマートコントラクト
   * 証書を売却するオークション (AuctionRepository) を実装するスマートコントラクト
-
-  * Vue / Vuetify JavaScriptフレームワークを使用したWebフロントエンド
-
-  * イーサリアムチェーンに (MetaMaskまたは他のクライアント経由で) 接続するためのweb3.jsライブラリ
-
-  * 画像などのリソースを保存するSwarmクライアント
-
-  * すべての参加者が使用できるオークションごとのチャットルームを作成するWhisperクライアント
+  
+* Vue / Vuetify JavaScriptフレームワークを使用したWebフロントエンド
+  
+* イーサリアムチェーンに (MetaMaskまたは他のクライアント経由で) 接続するためのweb3.jsライブラリ
+  
+* 画像などのリソースを保存するSwarmクライアント
+  
+* すべての参加者が使用できるオークションごとのチャットルームを作成するWhisperクライアント
 
 > (https://bit.ly/2DcmjyA)
 
@@ -653,3 +880,6 @@ EVMのバイトコードを逆アセンブルすることは良い方法です�
 * そのような変更を行う為のコストはいくらか
 * そのような変更を行う権限がどのように非中央集権化しているか
 * 何かが変更されたとき、誰がどうやってそのことを知るか
+
+
+
