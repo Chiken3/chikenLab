@@ -1,4 +1,7 @@
 # ganache で ERC721 を元にNFTを作り,拡張する。
+ERC721 token : https://github.com/nibbstack/erc721
+https://cam-inc.co.jp/p/techblog/603394496142509097
+
 
 ```bash
 $ cd
