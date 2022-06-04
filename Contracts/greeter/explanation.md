@@ -1,6 +1,6 @@
 # ganache で ERC721 を元にNFTを作り,拡張する。
-ERC721 token : https://github.com/nibbstack/erc721
-https://cam-inc.co.jp/p/techblog/603394496142509097
+ERC721 token exam mounting : https://github.com/nibbstack/erc721
+
 
 
 ```bash
@@ -301,5 +301,21 @@ $ npm install @openzeppelin/contracts #2022/5/30現在
 ```
 contract/Greeter.sol の最初の部分を以下のように変更
 ```js solidity
-import "@openzeppelin/contracts/ownership/Ownable.sol";
+pragma solidity >=0.4.22 <0.9.0;
+
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract OZGreeter is Ownable{
+    string private _greeting = "Hello, World!";
+
+    function greet() external view returns(string memory){
+        return _greeting;
+    }
+
+    function setGreeting(string calldata greeting) external onlyOwner {
+        _greeting = greeting;
+    }
+}
 ```
+---
+mapping, abstract とは、

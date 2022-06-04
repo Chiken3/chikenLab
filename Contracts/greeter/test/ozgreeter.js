@@ -14,24 +14,9 @@ contract("OZGreeter",(accounts) => {
                 assert.equal(actual,expected,"greeted with 'Hello, World!'");
             });
     });
-
-    describe("owner()", () => {
-        it("returns the address of the owner", async () => {
-            const greeter = await OZGreeterContract.deployed();
-            const owner = await greeter.owner();
-            assert(owner, "the current owner");
-        });
-
-        it("match the address that originally deployed the contract", async () => {
-            const greeter = await OZGreeterContract.deployed();
-            const owner = await greeter.owner();
-            const expected = accounts[0];
-            assert.equal(owner,expected,"matches address used to deploy contract");
-        });
-    });
 });
 
-contract("Greeter: update greeting", (accounts) => {
+contract("OZGreeter: update greeting", (accounts) => {
     describe("setGreeting(string)", () => {
         describe("when message is sent by the owner", () =>{
             it("sets greeting to passed in string", async () => {
