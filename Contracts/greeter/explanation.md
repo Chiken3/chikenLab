@@ -1,4 +1,5 @@
-# ganache で ERC721 を元にNFTを作り,拡張する。
+# greeter contract 作成手順。
+
 ERC721 token exam mounting : https://github.com/nibbstack/erc721
 
 
@@ -318,4 +319,3 @@ contract OZGreeter is Ownable{
 }
 ```
 ---
-mapping, abstract とは、
