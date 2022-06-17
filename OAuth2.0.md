@@ -1,17 +1,26 @@
 ---
 marp: true
+theme: gaia
+size: 16:9
+paginate: true
+header: OAuth2.0 summary
+footer: © Shutou Kenichi
 ---
  # OAuth2.0 まとめ & 実装
-
+<!--
+_class: lead
+-->
 ---
 
  # OAuth2.0 とは
- > - API 認可に使われるプロトコルである
- > - 認可とはリソースへのアクセス権を与える行為である。
- > 「認証と認可 Keycloak 入門」より
+  - API 認可に使われるプロトコルである
+  - 認可とはリソースへのアクセス権を与える行為である。
+  「認証と認可 Keycloak 入門」より
 
 ---
-
+<!--
+_class: lead
+-->
 # OAuth のフロー
 ## 1.OAuth の登場人物
 
