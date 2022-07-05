@@ -1,7 +1,13 @@
 # openzepplin ERC721 を元にNFTを作り,拡張する。
 1. OpenZepplelin が作成している ERC721 を動かしてみる
-<br>
+
+https://docs.openzeppelin.com/contracts/4.x/utilities
+
+https://docs.openzeppelin.com/contracts/4.x/access-control
+
 https://docs.openzeppelin.com/contracts/4.x/erc721
+
+https://docs.openzeppelin.com/contracts/4.x/api/access#AccessControl
 
 ```bash
 $ truffle init
