@@ -25,7 +25,7 @@ contract simpleNFT is ERC721URIStorage {
         _tokenIds.increment();
         return newTokenId;
     }
-
+    
     function getTokenName(uint256 tokenId) external view returns (string memory) {
         return tokenName[tokenId];
     }
